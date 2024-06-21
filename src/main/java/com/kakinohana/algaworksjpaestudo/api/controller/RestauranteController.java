@@ -2,6 +2,7 @@ package com.kakinohana.algaworksjpaestudo.api.controller;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kakinohana.algaworksjpaestudo.Groups;
 import com.kakinohana.algaworksjpaestudo.domain.exception.CozinhaNaoEncontradaException;
 import com.kakinohana.algaworksjpaestudo.domain.exception.EntidadeEmUsoException;
 import com.kakinohana.algaworksjpaestudo.domain.exception.EntidadeNaoEncontradaException;
@@ -18,9 +19,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.util.ReflectionUtils;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
@@ -48,7 +51,7 @@ public class RestauranteController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Restaurante adicionar(@RequestBody Restaurante restaurante) {
+    public Restaurante adicionar(@RequestBody @Valid Restaurante restaurante) {
         try {
             return cadastroRestaurante.salvar(restaurante);
         } catch (CozinhaNaoEncontradaException e) {
@@ -57,7 +60,7 @@ public class RestauranteController {
     }
 
     @PutMapping("/{restauranteId}")
-    public Restaurante atualizar(@PathVariable("restauranteId") Long restauranteId, @RequestBody Restaurante restaurante){
+    public Restaurante atualizar(@PathVariable("restauranteId") Long restauranteId, @RequestBody @Valid Restaurante restaurante){
         try {
             Restaurante restauranteAtual = cadastroRestaurante.buscarOuFalhar(restauranteId);
 

@@ -1,28 +1,29 @@
 package com.kakinohana.algaworksjpaestudo.domain.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.kakinohana.algaworksjpaestudo.Groups;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
 public class Cozinha {
 
+    @NotNull(groups = Groups.CozinhaId.class) //Diz que é do mesmo grupo que cadastroRestaurante, para que possa deixar null em um POST de cozinha
     @EqualsAndHashCode.Include
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     //@JsonProperty("Titulo") // Feito para trocar o nome
+    @NotBlank
     @Column(nullable = false)
     private String nome;
 
