@@ -1,110 +1,110 @@
-create table forma_pagamento (
+create table payment_method (
                                  id bigint not null auto_increment,
-                                 descricao varchar(60) not null,
+                                 description varchar(60) not null,
                                  primary key (id)
 ) engine=InnoDB default charset=utf8;
 
-create table grupo (
+create table `group` (
                        id bigint not null auto_increment,
-                       nome varchar(60) not null,
+                       name varchar(60) not null,
 
                        primary key (id)
 ) engine=InnoDB default charset=utf8;
 
-create table grupo_permissao (
-                                 grupo_id bigint not null,
-                                 permissao_id bigint not null,
+create table group_permission (
+                                 group_id bigint not null,
+                                 permission_id bigint not null,
 
-                                 primary key (grupo_id, permissao_id)
+                                 primary key (group_id, permission_id)
 ) engine=InnoDB default charset=utf8;
 
-create table permissao (
+create table permission (
                            id bigint not null auto_increment,
-                           descricao varchar(60) not null,
-                           nome varchar(100) not null,
+                           description varchar(60) not null,
+                           name varchar(100) not null,
 
                            primary key (id)
 ) engine=InnoDB default charset=utf8;
 
-create table produto (
+create table product (
                          id bigint not null auto_increment,
-                         restaurante_id bigint not null,
-                         nome varchar(80) not null,
-                         descricao text not null,
-                         preco decimal(10,2) not null,
-                         ativo tinyint(1) not null,
+                         restaurant_id bigint not null,
+                         name varchar(80) not null,
+                         description text not null,
+                         price decimal(10,2) not null,
+                         active tinyint(1) not null,
 
                          primary key (id)
 ) engine=InnoDB default charset=utf8;
 
-create table restaurante (
+create table restaurant (
                              id bigint not null auto_increment,
-                             cozinha_id bigint not null,
-                             nome varchar(80) not null,
-                             taxa_frete decimal(10,2) not null,
-                             data_atualizacao datetime not null,
-                             data_cadastro datetime not null,
+                             cuisine_id bigint not null,
+                             name varchar(80) not null,
+                             delivery_tax decimal(10,2) not null,
+                             update_date datetime not null,
+                             register_date datetime not null,
 
-                             endereco_cidade_id bigint,
-                             endereco_cep varchar(9),
-                             endereco_logradouro varchar(100),
-                             endereco_numero varchar(20),
-                             endereco_complemento varchar(60),
-                             endereco_bairro varchar(60),
+                             address_city_id bigint,
+                             address_cep varchar(9),
+                             address_street varchar(100),
+                             address_number varchar(20),
+                             address_complement varchar(60),
+                             address_neighborhood varchar(60),
 
                              primary key (id)
 ) engine=InnoDB default charset=utf8;
 
-create table restaurante_forma_pagamento (
-                                             restaurante_id bigint not null,
-                                             forma_pagamento_id bigint not null,
+create table restaurant_payment_method (
+                                             restaurant_id bigint not null,
+                                             payment_method_id bigint not null,
 
-                                             primary key (restaurante_id, forma_pagamento_id)
+                                             primary key (restaurant_id, payment_method_id)
 ) engine=InnoDB default charset=utf8;
 
-create table usuario (
+create table user (
                          id bigint not null auto_increment,
-                         nome varchar(80) not null,
+                         name varchar(80) not null,
                          email varchar(255) not null,
-                         senha varchar(255) not null,
-                         data_cadastro datetime not null,
+                         password varchar(255) not null,
+                         register_date datetime not null,
 
                          primary key (id)
 ) engine=InnoDB default charset=utf8;
 
-create table usuario_grupo (
-                               usuario_id bigint not null,
-                               grupo_id bigint not null,
+create table user_group (
+                               user_id bigint not null,
+                               group_id bigint not null,
 
-                               primary key (usuario_id, grupo_id)
+                               primary key (user_id, group_id)
 ) engine=InnoDB default charset=utf8;
 
 
 
 
-alter table grupo_permissao add constraint fk_grupo_permissao_permissao
-    foreign key (permissao_id) references permissao (id);
+alter table group_permission add constraint fk_group_permission_permission
+    foreign key (permission_id) references permission (id);
 
-alter table grupo_permissao add constraint fk_grupo_permissao_grupo
-    foreign key (grupo_id) references grupo (id);
+alter table group_permission add constraint fk_group_permission_group
+    foreign key (group_id) references `group` (id);
 
-alter table produto add constraint fk_produto_restaurante
-    foreign key (restaurante_id) references restaurante (id);
+alter table product add constraint fk_product_restaurant
+    foreign key (restaurant_id) references restaurant (id);
 
-alter table restaurante add constraint fk_restaurante_cozinha
-    foreign key (cozinha_id) references cozinha (id);
+alter table restaurant add constraint fk_restaurant_cuisine
+    foreign key (cuisine_id) references cuisine (id);
 
-alter table restaurante add constraint fk_restaurante_cidade
-    foreign key (endereco_cidade_id) references cidade (id);
+alter table restaurant add constraint fk_restaurant_city
+    foreign key (address_city_id) references city (id);
 
-alter table restaurante_forma_pagamento add constraint fk_rest_forma_pagto_forma_pagto
-    foreign key (forma_pagamento_id) references forma_pagamento (id);
+alter table restaurant_payment_method add constraint fk_rest_payment_method_payment_method
+    foreign key (payment_method_id) references payment_method (id);
 
-alter table restaurante_forma_pagamento add constraint fk_rest_forma_pagto_restaurante
-    foreign key (restaurante_id) references restaurante (id);
+alter table restaurant_payment_method add constraint fk_rest_payment_method_rest
+    foreign key (restaurant_id) references restaurant (id);
 
-alter table usuario_grupo add constraint fk_usuario_grupo_grupo
-    foreign key (grupo_id) references grupo (id);
+alter table user_group add constraint fk_user_group_group
+    foreign key (group_id) references `group` (id);
 
-alter table usuario_grupo add constraint fk_usuario_grupo_usuario
-    foreign key (usuario_id) references usuario (id);
+alter table user_group add constraint fk_user_group_user
+    foreign key (user_id) references user (id);
