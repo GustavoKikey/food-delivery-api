@@ -1,7 +1,7 @@
 package com.kakinohana.deliveryapi.domain.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.kakinohana.deliveryapi.Groups;
+import com.kakinohana.deliveryapi.core.validation.Groups;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

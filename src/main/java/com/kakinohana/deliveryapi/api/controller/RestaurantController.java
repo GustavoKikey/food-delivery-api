@@ -2,6 +2,7 @@ package com.kakinohana.deliveryapi.api.controller;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kakinohana.deliveryapi.core.validation.ValidationException;
 import com.kakinohana.deliveryapi.domain.exception.CuisineNotFoundException;
 import com.kakinohana.deliveryapi.domain.exception.BusinessException;
 import com.kakinohana.deliveryapi.domain.model.Restaurant;
@@ -14,6 +15,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.util.ReflectionUtils;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.SmartValidator;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -31,6 +34,9 @@ public class RestaurantController {
 
     @Autowired
     private RegisterRestaurantService registerRestaurantService;
+
+    @Autowired
+    private SmartValidator validator;
 
     @GetMapping
     public List<Restaurant> list(){
@@ -74,8 +80,18 @@ public class RestaurantController {
         Restaurant restaurantAtual = registerRestaurantService.findOrFail(restaurantId);
 
         merge (fields, restaurantAtual, request);
+        validate(restaurantAtual, "restaurante");
 
         return update(restaurantId, restaurantAtual);
+    }
+
+    private void validate(Restaurant restaurant, String objectName){
+        BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(restaurant, objectName);
+        validator.validate(restaurant, bindingResult);
+
+        if (bindingResult.hasErrors()) {
+            throw new ValidationException(bindingResult);
+        }
     }
 
     private void merge(Map<String, Object> originData, Restaurant targetRestaurant, HttpServletRequest request){

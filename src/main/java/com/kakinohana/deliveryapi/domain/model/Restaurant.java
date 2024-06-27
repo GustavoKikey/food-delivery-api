@@ -1,7 +1,9 @@
 package com.kakinohana.deliveryapi.domain.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.kakinohana.deliveryapi.Groups;
+import com.kakinohana.deliveryapi.core.validation.DeliveryTax;
+import com.kakinohana.deliveryapi.core.validation.Groups;
+import com.kakinohana.deliveryapi.core.validation.ZeroValueIncludesDescription;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.CreationTimestamp;
@@ -18,6 +20,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+@ZeroValueIncludesDescription(fieldValue = "deliveryTax", fieldDescription = "name", requiredDescription = "Frete Grátis")
 @Entity
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Data
@@ -33,7 +36,8 @@ public class Restaurant {
     private String name;
 
     @NotNull
-    @PositiveOrZero
+    //@PositiveOrZero
+    @DeliveryTax
     @Column(name = "delivery_tax", nullable = false)
     private BigDecimal deliveryTax;
     

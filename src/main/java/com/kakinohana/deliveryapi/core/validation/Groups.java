@@ -1,4 +1,4 @@
-package com.kakinohana.deliveryapi;
+package com.kakinohana.deliveryapi.core.validation;
 
 public interface Groups {
 

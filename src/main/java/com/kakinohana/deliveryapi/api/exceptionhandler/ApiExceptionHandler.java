@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonMappingException.Reference;
 import com.fasterxml.jackson.databind.exc.IgnoredPropertyException;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
+import com.kakinohana.deliveryapi.core.validation.ValidationException;
 import com.kakinohana.deliveryapi.domain.exception.EntityInUseException;
 import com.kakinohana.deliveryapi.domain.exception.EntityNotFoundException;
 import com.kakinohana.deliveryapi.domain.exception.BusinessException;
@@ -17,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -115,28 +117,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
 
-        ErrorType errorType = ErrorType.DADOS_INVALIDOS;
-        String detail = String.format("Um ou mais campos estão inválidos. Faça o preenchimento correto e tente novamente.");
-
-        BindingResult bindingResult = ex.getBindingResult();
-
-        List<ApiError.Field> problemFields = bindingResult.getFieldErrors().stream()
-                .map(fieldError -> {
-                    String message = messageSource.getMessage(fieldError, LocaleContextHolder.getLocale());
-
-                    return ApiError.Field.builder()
-                        .name(fieldError.getField())
-                        .userMessage(message)
-                        .build();
-                })
-                .toList();
-
-        ApiError error = createErrorBuilder(status, errorType, detail)
-                .userMessage(detail)
-                .fields(problemFields)
-                .build()                        ;
-
-        return handleExceptionInternal(ex, error, new HttpHeaders(), status, request);
+        return handleValidationInternal(ex, ex.getBindingResult(), headers, status, request);
     }
 
     @Override
@@ -240,6 +221,12 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
         return handleExceptionInternal(ex, apiError, new HttpHeaders(), status, request);
     }
 
+    @ExceptionHandler(ValidationException.class)
+    public ResponseEntity<?> handleValidationException(ValidationException ex, WebRequest request){
+        return handleValidationInternal(ex, ex.getBindingResult(), new HttpHeaders(),
+                HttpStatus.BAD_REQUEST, request);
+    }
+
     @Override
     protected ResponseEntity<Object> handleExceptionInternal(Exception ex, Object body, HttpHeaders headers, HttpStatus status, WebRequest request) {
 
@@ -276,5 +263,39 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
                 .type(errorType.getUri())
                 .title(errorType.getTitle())
                 .detail(detail);
+    }
+
+    private List<ApiError.Object> createProblemObjects(BindingResult bindingResult){
+        List<ApiError.Object> problemObjects = bindingResult.getAllErrors().stream().map(objectError -> {
+
+            String message = messageSource.getMessage(objectError, LocaleContextHolder.getLocale());
+
+            String name = objectError.getObjectName();
+
+            if (objectError instanceof FieldError) {
+                name = ((FieldError)objectError).getField();
+            }
+
+            return ApiError.Object.builder()
+                    .name(name)
+                    .userMessage(message)
+                    .build();
+        })
+                .collect(Collectors.toList());
+
+        return problemObjects;
+    }
+
+    private ResponseEntity<Object> handleValidationInternal(Exception ex, BindingResult bindingResult, HttpHeaders headers, HttpStatus status, WebRequest request) {
+        ErrorType errorType = ErrorType.DADOS_INVALIDOS;
+        String detail = "Um ou mais campos estão inválidos. Faça o preenchimento correto e tente novamente.";
+
+        List<ApiError.Object> problemObjects = createProblemObjects(bindingResult);
+        ApiError error = createErrorBuilder(status, errorType, detail)
+                .userMessage(detail)
+                .objects(problemObjects)
+                .build();
+
+        return handleExceptionInternal(ex, error, new HttpHeaders(), status, request);
     }
 }
