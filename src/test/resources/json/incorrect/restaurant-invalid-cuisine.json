@@ -1,0 +1,7 @@
+{
+  "name": "restaurant test",
+  "deliveryTax": 10,
+  "cuisine": {
+    "id": 100
+  }
+}
