@@ -10,6 +10,8 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
+
 @Service
 public class RegisterCityService {
 
@@ -21,6 +23,7 @@ public class RegisterCityService {
     private RegisterStateService registerStateService;
 
 
+    @Transactional
     public City save(City city){
         Long stateId = city.getState().getId();
         State state = registerStateService.findOrFail(stateId);
@@ -30,6 +33,7 @@ public class RegisterCityService {
         return cityRepository.save(city);
     }
 
+    @Transactional
     public void delete(Long cityId){
         try {
             cityRepository.deleteById(cityId);

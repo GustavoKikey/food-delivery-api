@@ -9,6 +9,8 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
+
 @Service
 public class RegisterCuisineService {
 
@@ -18,10 +20,12 @@ public class RegisterCuisineService {
     @Autowired
     private CuisineRepository cuisineRepository;
 
+    @Transactional
     public Cuisine save(Cuisine cuisine) {
         return cuisineRepository.save(cuisine);
     }
 
+    @Transactional
     public void delete(Long cuisineId) {
         try {
             cuisineRepository.deleteById(cuisineId);
