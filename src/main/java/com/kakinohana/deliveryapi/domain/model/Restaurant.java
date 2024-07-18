@@ -1,6 +1,5 @@
 package com.kakinohana.deliveryapi.domain.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.kakinohana.deliveryapi.core.validation.DeliveryTax;
 import com.kakinohana.deliveryapi.core.validation.Groups;
 import com.kakinohana.deliveryapi.core.validation.ZeroValueIncludesDescription;
@@ -13,7 +12,6 @@ import javax.persistence.*;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.PositiveOrZero;
 import javax.validation.groups.ConvertGroup;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -41,8 +39,6 @@ public class Restaurant {
     @Column(name = "delivery_tax", nullable = false)
     private BigDecimal deliveryTax;
     
-    //@JsonIgnore
-    //@JsonIgnoreProperties("hibernateLazyInitializer") // Tira o erro de quando vai serializar e o Lazy não deixa
     @ConvertGroup(to = Groups.CuisineId.class)
     @NotNull
     @Valid
@@ -50,26 +46,21 @@ public class Restaurant {
     @JoinColumn(name = "cuisine_id", nullable = false) //Faz isso caso precise colocar numa coluna com um nome diferente lá no banco
     private Cuisine cuisine;
 
-    @JsonIgnore
     @Embedded // Indica que to incorporando essa classe
     private Address address;
 
-    @JsonIgnore
     @CreationTimestamp
     @Column(nullable = false)
     private LocalDateTime registerDate;
 
-    @JsonIgnore
     @UpdateTimestamp
     @Column(nullable = false)
     private LocalDateTime updateDate;
 
 
-    @JsonIgnore
     @OneToMany (mappedBy = "restaurant")
     private List<Product> products;
 
-    //@JsonIgnore
     @ManyToMany
     @JoinTable(name = "restaurant_payment_method",
             joinColumns = @JoinColumn(name = "restaurant_id"),

@@ -26,12 +26,10 @@ public class User {
     @Column(nullable = false)
     private String password;
 
-    @JsonIgnore
     @CreationTimestamp
     @Column(nullable = false)
     private LocalDateTime registerDate;
 
-    @JsonIgnore
     @ManyToMany
     @JoinTable(name = "user_group",
             joinColumns = @JoinColumn(name = "user_id"),

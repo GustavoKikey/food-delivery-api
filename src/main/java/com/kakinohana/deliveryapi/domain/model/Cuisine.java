@@ -27,7 +27,6 @@ public class Cuisine {
     @Column(nullable = false)
     private String name;
 
-    @JsonIgnore // Não mostra essa propriedade na requisição, pq senao na hora de serializar, ia ficar em loop
     @OneToMany(mappedBy = "cuisine") // Faz um mapeamento de um pra muitos (o contrario do que é restaurante pra cozinha)
     private List<Restaurant> restaurants = new ArrayList<>();
 
